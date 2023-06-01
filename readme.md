@@ -1,0 +1,1 @@
+# Go suffix automaton implementation
