@@ -2,4 +2,4 @@ package suffy
 
 import "errors"
 
-var InvalidUTF8 = errors.New("invalid UTF-8 encoded string")
+var InvalidUTF8 = errors.New("invalid UTF-8 encoding")
