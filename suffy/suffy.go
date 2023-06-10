@@ -4,7 +4,6 @@ Package suffy implements a low memory implementation of a suffix automaton
 package suffy
 
 import (
-	"errors"
 	"unicode/utf8"
 )
 
@@ -36,7 +35,7 @@ func New() *Suffy {
 // InsertString enlarges the automaton to allow all substrings of the newly inserted string to be part of it
 func (suffy *Suffy) InsertString(s string) error {
 	if !utf8.ValidString(s) {
-		return errors.New("invalid UTF-8 encoded string")
+		return InvalidUTF8
 	}
 
 	if suffy.edges == nil {
@@ -53,7 +52,7 @@ func (suffy *Suffy) InsertString(s string) error {
 // Insert a new rune at the end of the last string inserted with InsertString or at the end of the last rune inserted with Insert
 func (suffy *Suffy) Insert(char rune) error {
 	if !utf8.ValidRune(char) {
-		return errors.New("invalid UTF-8 encoded rune")
+		return InvalidUTF8
 	}
 
 	suffy.unsafeInsert(char)
@@ -107,7 +106,7 @@ func (suffy *Suffy) unsafeInsert(char rune) {
 // IsSubstring returns true if is a substring of the strings inserted so far in Suffy, returns an error if the given string is not valid utf-8
 func (suffy *Suffy) IsSubstring(s string) (bool, error) {
 	if !utf8.ValidString(s) {
-		return false, errors.New("invalid UTF-8 encoded string")
+		return false, InvalidUTF8
 	}
 
 	pos := 0
