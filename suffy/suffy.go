@@ -1,3 +1,6 @@
+/*
+Package suffy implements a low memory implementation of a suffix automaton
+*/
 package suffy
 
 import (
@@ -5,8 +8,16 @@ import (
 	"unicode/utf8"
 )
 
-// Suffy is a friendly nickname for suffix automaton, this implementation is based on this blog: https://codeforces.com/blog/entry/20861
-// but it will use arrays instead of maps for better memory complexity at the cost of time complexity
+// Suffy allows the Insert, InsertString and IsSubstring methods.
+//
+// Example:
+//
+//	s := suffy.New()
+//	s.InsertString("Welcome new gopher!")
+//	isGopherThere := s.IsSubstring("gopher")
+//	fmt.Println(isGopherThere)                // true
+//	isSnakeThere := s.IsSubstring("snake")
+//	fmt.Println(isSnakeThere)                 // false
 type Suffy struct {
 	edges  []hMap
 	link   []int
@@ -22,6 +33,7 @@ func New() *Suffy {
 	return suffy
 }
 
+// InsertString enlarges the automaton to allow all substrings of the newly inserted string to be part of it
 func (suffy *Suffy) InsertString(s string) error {
 	if !utf8.ValidString(s) {
 		return errors.New("invalid UTF-8 encoded string")
@@ -38,6 +50,7 @@ func (suffy *Suffy) InsertString(s string) error {
 	return nil
 }
 
+// Insert a new rune at the end of the last string inserted with InsertString or at the end of the last rune inserted with Insert
 func (suffy *Suffy) Insert(char rune) error {
 	if !utf8.ValidRune(char) {
 		return errors.New("invalid UTF-8 encoded rune")
@@ -91,6 +104,7 @@ func (suffy *Suffy) unsafeInsert(char rune) {
 	return
 }
 
+// IsSubstring returns true if is a substring of the strings inserted so far in Suffy, returns an error if the given string is not valid utf-8
 func (suffy *Suffy) IsSubstring(s string) (bool, error) {
 	if !utf8.ValidString(s) {
 		return false, errors.New("invalid UTF-8 encoded string")

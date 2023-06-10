@@ -66,6 +66,7 @@ func dist(key rune, pos int32, size int32) int32 {
 	return (pos + size - key) % size
 }
 
+// Get the value of the element with the given key, and a bool to distinguish between value 0 and non-existing element
 func (h *hMap) Get(key rune) (int, bool) {
 	if h.Len() == 0 {
 		return 0, false
@@ -86,6 +87,7 @@ func (h *hMap) Get(key rune) (int, bool) {
 	return 0, false
 }
 
+// Copy returns a deep copy of this map
 func (h *hMap) Copy() hMap {
 	newBuckets := make([]*bucket, h.Cap())
 	copy(newBuckets, h.buckets)
