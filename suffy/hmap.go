@@ -7,14 +7,15 @@ type bucket struct {
 
 // Hash table implementation
 type hMap struct {
-	Buckets []*bucket
+	buckets      []*bucket
+	bucketAmount int32
 }
 
 // Len returns the len of the underlying slice
-func (h *hMap) Len() int32 { return int32(len(h.Buckets)) }
+func (h *hMap) Len() int32 { return h.bucketAmount }
 
 // Cap returns the cap of the underlying slice
-func (h *hMap) Cap() int32 { return int32(cap(h.Buckets)) }
+func (h *hMap) Cap() int32 { return int32(cap(h.buckets)) }
 
 // Resize resizes the underlying slice to the given size or does nothing if the given size is smaller than the amount of elements
 func (h *hMap) Resize(size int32) {
@@ -23,12 +24,12 @@ func (h *hMap) Resize(size int32) {
 		return
 	}
 
-	newMap := &hMap{make([]*bucket, size)}
+	newMap := &hMap{make([]*bucket, size), h.bucketAmount}
 
 	if h.Len() != 0 {
 		for i := int32(0); i < h.Len(); i++ {
-			if h.Buckets[i] != nil {
-				newMap.Insert(h.Buckets[i].Key, h.Buckets[i].Value)
+			if h.buckets[i] != nil {
+				newMap.Insert(h.buckets[i].Key, h.buckets[i].Value)
 			}
 		}
 	}
@@ -44,18 +45,19 @@ func (h *hMap) Insert(key rune, value int) {
 		h.Resize(h.Len()*2 + 1)
 	}
 
-	pos := key % h.Len()
+	pos := key % h.Cap()
 	element := &bucket{key, value}
 
-	for ; h.Buckets[pos] != nil; pos = (pos + 1) % h.Len() {
-		if h.Buckets[pos].Key == element.Key {
+	for ; h.buckets[pos] != nil; pos = (pos + 1) % h.Cap() {
+		if h.buckets[pos].Key == element.Key {
 			break
-		} else if dist(element.Key, pos, h.Len()) > dist(h.Buckets[pos].Key, pos, h.Len()) {
-			element, h.Buckets[pos] = h.Buckets[pos], element
+		} else if dist(element.Key, pos, h.Cap()) > dist(h.buckets[pos].Key, pos, h.Cap()) {
+			element, h.buckets[pos] = h.buckets[pos], element
 		}
 	}
 
-	h.Buckets[pos] = element
+	h.buckets[pos] = element
+	h.bucketAmount++
 
 	return
 }
@@ -68,14 +70,14 @@ func (h *hMap) Get(key rune) (int, bool) {
 	if h.Len() == 0 {
 		return 0, false
 	}
-	pos := key % h.Len()
+	pos := key % h.Cap()
 	opos := pos
 
-	for h.Buckets[pos] != nil {
-		if h.Buckets[pos].Key == key {
-			return h.Buckets[pos].Value, true
+	for h.buckets[pos] != nil {
+		if h.buckets[pos].Key == key {
+			return h.buckets[pos].Value, true
 		}
-		pos = (pos + 1) % h.Len()
+		pos = (pos + 1) % h.Cap()
 		if pos == opos {
 			break
 		}
@@ -85,7 +87,7 @@ func (h *hMap) Get(key rune) (int, bool) {
 }
 
 func (h *hMap) Copy() hMap {
-	newBuckets := make([]*bucket, h.Len())
-	copy(newBuckets, h.Buckets)
-	return hMap{newBuckets}
+	newBuckets := make([]*bucket, h.Cap())
+	copy(newBuckets, h.buckets)
+	return hMap{newBuckets, h.bucketAmount}
 }
