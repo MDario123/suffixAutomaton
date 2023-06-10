@@ -32,7 +32,8 @@ func New() *Suffy {
 	return suffy
 }
 
-// InsertString enlarges the automaton to allow all substrings of the newly inserted string to be part of it
+// InsertString enlarges the automaton to allow all substrings of the newly inserted string to be part of it,
+// returns InvalidUTF8 if the given string is not valid utf-8 encoded
 func (suffy *Suffy) InsertString(s string) error {
 	if !utf8.ValidString(s) {
 		return InvalidUTF8
@@ -49,7 +50,8 @@ func (suffy *Suffy) InsertString(s string) error {
 	return nil
 }
 
-// Insert a new rune at the end of the last string inserted with InsertString or at the end of the last rune inserted with Insert
+// Insert a new rune at the end of the last string inserted with InsertString or at the end of the last rune inserted with Insert,
+// returns InvalidUTF8 if the given string is not valid utf-8 encoded
 func (suffy *Suffy) Insert(char rune) error {
 	if !utf8.ValidRune(char) {
 		return InvalidUTF8
@@ -103,7 +105,8 @@ func (suffy *Suffy) unsafeInsert(char rune) {
 	return
 }
 
-// IsSubstring returns true if is a substring of the strings inserted so far in Suffy, returns an error if the given string is not valid utf-8
+// IsSubstring returns true if is a substring of the strings inserted so far in Suffy,
+// returns InvalidUTF8 if the given string is not valid utf-8 encoded
 func (suffy *Suffy) IsSubstring(s string) (bool, error) {
 	if !utf8.ValidString(s) {
 		return false, InvalidUTF8
